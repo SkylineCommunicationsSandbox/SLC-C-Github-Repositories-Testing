@@ -1,0 +1,4300 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+
+****************************************************************************
+*  Copyright (c) 2023,  Skyline Communications NV  All Rights Reserved.    *
+****************************************************************************
+
+By using this driver, you expressly agree with the usage terms and
+conditions set out below.
+This driver and all related materials are protected by copyrights and
+other intellectual property rights that exclusively belong
+to Skyline Communications.
+
+A user license granted for this driver is strictly for personal use only.
+This driver may not be used in any way by anyone without the prior
+written consent of Skyline Communications. Any sublicensing of this
+driver is forbidden.
+
+Any modifications to this driver by the user are only allowed for
+personal use and within the intended purpose of the driver,
+and will remain the sole responsibility of the user.
+Skyline Communications will not be responsible for any damages or
+malfunctions whatsoever of the driver resulting from a modification
+or adaptation by the user.
+
+The content of this driver is confidential information.
+The user hereby agrees to keep this confidential information strictly
+secret and confidential and not to disclose or reveal it, in whole
+or in part, directly or indirectly to any person, entity, organization
+or administration without the prior written consent of
+Skyline Communications.
+
+Any inquiries can be addressed to:
+
+	Skyline Communications NV
+	Ambachtenstraat 33
+	B-8870 Izegem
+	Belgium
+	Tel.	: +32 51 31 35 69
+	Fax.	: +32 51 31 01 29
+	E-mail	: info@skyline.be
+	Web		: www.skyline.be
+	Contact	: Ben Vandenberghe
+
+-->
+
+<Protocol xmlns="http://www.skyline.be/protocol">
+	<Name>Github Repositories</Name>
+	<Description>Github Repositories DataMiner connector</Description>
+	<Version>1.0.0.5</Version>
+	<IntegrationID>DMS-DRV-0</IntegrationID>
+	<Provider>Skyline Communications</Provider>
+	<Vendor>Github</Vendor>
+	<VendorOID>1.3.6.1.4.1.8813.2.0</VendorOID>
+	<DeviceOID>0</DeviceOID>
+	<ElementType>Github Repositories</ElementType>
+	<Type relativeTimers="true">http</Type>
+	<Display defaultPage="General" pageOrder="General;Organizations;----------;Repositories - Overview;Repositories;Issues;Workflows" wideColumnPages=""/>
+	<SNMP includepages="true">auto</SNMP>
+
+	<Compliancies>
+		<CassandraReady>true</CassandraReady>
+		<MinimumRequiredVersion>10.1.0.0 - 9966</MinimumRequiredVersion>
+	</Compliancies>
+
+	<Relations>
+		<Relation name="Repository Issues" path="1000;2000"/>
+		<Relation name="Repository Tags" path="1000;1200"/>
+		<Relation name="Repository Releases" path="1000;1400"/>
+		<Relation name="Repository Workflows" path="1000;1600"/>
+		<Relation name="Tags Releases" path="1200;1400"/>
+	</Relations>
+
+	<TreeControls>
+		<TreeControl parameterId="996">
+			<Hierarchy>
+				<Table id="1000"/>
+			</Hierarchy>
+			<ExtraTabs>
+				<Tab title="Tags" tableId="1000" type="relation" parameter="1203"/>
+				<Tab title="Releases" tableId="1000" type="relation" parameter="1413"/>
+				<Tab title="Issues" tableId="1000" type="relation" parameter="2011"/>
+				<Tab title="Workflows" tableId="1000" type="relation" parameter="1602"/>
+			</ExtraTabs>
+		</TreeControl>
+	</TreeControls>
+
+	<Params>
+		<Param id="2">
+			<Name>AfterStartup</Name>
+			<Description>After Startup</Description>
+			<Type>dummy</Type>
+		</Param>
+		<Param id="5" trending="false">
+			<Name>Explanation</Name>
+			<Description>How to Use</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>How to use the protocol</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<DefaultValue>
+					<![CDATA[To start tracking repositories, add one to the repositories table. This can be done via the context menu or via the add repository page.
+Both will ask for the repository owner and name, both can be found in the url of the github repository.
+
+By default this element runs without an api key. This means that the element can only sent 60 request per hour before being blocked out by Github.
+To get more request you can add an api key under General/Configuration page. To generate such a token you can go to Github.com -> Settings -> Developer settings -> Personal access tokens -> tokens (classic), to generate one.]]>
+				</DefaultValue>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>General</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type lines="15">string</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="10" save="true">
+			<Name>ApiKey</Name>
+			<Description>API Key</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>
+					<![CDATA[The api key retrieved by going to your account settings -> Developer settings -> Personal access tokens -> Tokens (classic)]]>
+				</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Configuration</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="password">string</Type>
+			</Measurement>
+		</Param>
+		<Param id="11" setter="true">
+			<Name>ApiKey</Name>
+			<Description>API Key</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Configuration</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="password">string</Type>
+			</Measurement>
+		</Param>
+		<Param id="12" save="true">
+			<Name>ApiKeyBearer</Name>
+			<Description>Api Key Bearer</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="13" save="true">
+			<Name>GithubApiVersion</Name>
+			<Description>Github API Version</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The Api version this element uses.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<DefaultValue>2022-11-28</DefaultValue>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>2022-11-28</Normal>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Configuration</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>2022-11-28</Display>
+						<Value>2022-11-28</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="14" setter="true">
+			<Name>GithubApiVersion</Name>
+			<Description>Github API Version</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Configuration</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>2022-11-28</Display>
+						<Value>2022-11-28</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		
+		<Param id="15" trending="true">
+			<Name>RateLimit</Name>
+			<Description>Rate Limit</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The maximum number of request this api key can make in one hour.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<CL>60</CL>
+				<Normal>5000</Normal>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<!-- SuppressValidator 2.9.4 This is correct -->
+				<Units>requests</Units>
+				<!-- /SuppressValidator 2.9.4 -->
+				<Range>
+					<Low>0</Low>
+				</Range>
+				<Positions>
+					<Position>
+						<Page>General</Page>
+						<Column>1</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="16" trending="true">
+			<Name>RateLimitRemaining</Name>
+			<Description>Rate Limit Remaining</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The amount of hourly request remaining.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<CL>250</CL>
+				<MaL>750</MaL>
+				<MiL>1500</MiL>
+				<WaL>2500</WaL>
+				<Normal>6000</Normal>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<!-- SuppressValidator 2.9.4 This is correct -->
+				<Units>requests</Units>
+				<!-- /SuppressValidator 2.9.4 -->
+				<Range>
+					<Low>0</Low>
+				</Range>
+				<Positions>
+					<Position>
+						<Page>General</Page>
+						<Column>1</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="17" trending="true">
+			<Name>RateLimitUsed</Name>
+			<Description>Rate Limit Used</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The amount of hourly request already used.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>0</Normal>
+				<WaH>2500</WaH>
+				<MiH>3500</MiH>
+				<MaH>4250</MaH>
+				<CH>4750</CH>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<!-- SuppressValidator 2.9.4 This is correct -->
+				<Units>requests</Units>
+				<!-- /SuppressValidator 2.9.4 -->
+				<Range>
+					<Low>0</Low>
+				</Range>
+				<Positions>
+					<Position>
+						<Page>General</Page>
+						<Column>1</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="18" trending="false">
+			<Name>RateLimitReset</Name>
+			<Description>Rate Limit Reset</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The date time when the rate limit is going to reset again.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Decimals>8</Decimals>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+				<Positions>
+					<Position>
+						<Page>General</Page>
+						<Column>1</Column>
+						<Row>3</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="19">
+			<Name>RateLimitResetEpochSeconds</Name>
+			<Description>Rate Limit Reset Epoch Seconds</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="30">
+			<Name>TriggerRequestHandling</Name>
+			<Description>Trigger Request Handling</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<LengthType>next param</LengthType>
+				<Type>string</Type>
+			</Interprete>
+		</Param>
+		
+		<Param id="50">
+			<Name>GeneralPageButtons</Name>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>General</Page>
+						<Column>1</Column>
+						<Row>4</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type width="110">pagebutton</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Configuration...</Display>
+						<Value>Configuration</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Poll Manager...</Display>
+						<Value>Poll Manager</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="51">
+			<Name>AddRepositoryPageButton</Name>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Repositories</Page>
+						<Column>0</Column>
+						<Row>4</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type width="110">pagebutton</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Add Repository...</Display>
+						<Value>Add Repository</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="52">
+			<Name>AddWorkflowPageButton</Name>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Workflows</Page>
+						<Column>0</Column>
+						<Row>3</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type width="110">pagebutton</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Add Workflow...</Display>
+						<Value>Add Workflow</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		
+		<Param id="100" trending="false">
+			<Name>StatusCode</Name>
+			<Description>Status Code</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="101" save="true">
+			<Name>GetRepositoryUrl</Name>
+			<Description>Get Repository Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="102" save="true">
+			<Name>GetRepositoryIssuesUrl</Name>
+			<Description>Get Repository Issues Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="103">
+			<Name>GetRepositoryTagsUrl</Name>
+			<Description>Get Repository Tags Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="104">
+			<Name>GetRepositoryReleasesUrl</Name>
+			<Description>Get Repository Releases Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="105">
+			<Name>GetRepositoryWorkflowsUrl</Name>
+			<Description>Get Repository Workflows Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="155">
+			<Name>GetRepositoryWorkflowsQueue</Name>
+			<Description>Get Repository Workflows Queue</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="110">
+			<Name>GetUserOrganizationsUrl</Name>
+			<Description>Get User Organizations Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="111">
+			<Name>GetOrganizationRepositoriesUrl</Name>
+			<Description>Get Organization Repositories Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="120">
+			<Name>GetRepositoryContentUrl</Name>
+			<Description>Get Repository Content Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="121">
+			<Name>PutRepositoryContentUrl</Name>
+			<Description>Create/Update Repository Content Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="171">
+			<Name>PutRepositoryContentBody</Name>
+			<Description>Create/Update Repository Content Body</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="126">
+			<Name>PutRepositorySecretUrl</Name>
+			<Description>Create/Update Repository Secret Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="176">
+			<Name>PutRepositorySecretBody</Name>
+			<Description>Create/Update Repository Secret Body</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="128">
+			<Name>GetRepositoryPublicKeyUrl</Name>
+			<Description>Get Repository Public Key Url</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="178">
+			<Name>GetRepositoryPublicKeyQueue</Name>
+			<Description>Get Repository Public Key Queue</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		
+		<Param id="201">
+			<Name>GetRepositoryContent</Name>
+			<Description>Get Repository Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="251">
+			<Name>GetRepositoryLinkHeader</Name>
+			<Description>Get Repository Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="202">
+			<Name>GetRepositoryIssuesContent</Name>
+			<Description>Get Repository Issues Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="252">
+			<Name>GetRepositoryIssuesLinkHeader</Name>
+			<Description>Get Repository Issues Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="203">
+			<Name>GetRepositoryTagsContent</Name>
+			<Description>Get Repository Tags Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="253">
+			<Name>GetRepositoryTagsLinkHeader</Name>
+			<Description>Get Repository Tags Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="204">
+			<Name>GetRepositoryReleasesContent</Name>
+			<Description>Get Repository Releases Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="254">
+			<Name>GetRepositoryReleasesLinkHeader</Name>
+			<Description>Get Repository Releases Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="205">
+			<Name>GetRepositoryWorkflowsContent</Name>
+			<Description>Get Repository Workflows Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="255">
+			<Name>GetRepositoryWorkflowsLinkHeader</Name>
+			<Description>Get Repository Workflows Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="210">
+			<Name>GetUserOrganizationsContent</Name>
+			<Description>Get User Organizations Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="260">
+			<Name>GetUserOrganizationsLinkHeader</Name>
+			<Description>Get User Organizations Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="211">
+			<Name>GetOrganizationRepositoriesContent</Name>
+			<Description>Get Organization Repositories Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="261">
+			<Name>GetOrganizationRepositoriesLinkHeader</Name>
+			<Description>Get Organization Repositories Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="220">
+			<Name>GetRepositoryContentContent</Name>
+			<Description>Get Repository Content Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="270">
+			<Name>GetRepositoryContentLinkHeader</Name>
+			<Description>Get Repository Content Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="221">
+			<Name>PutRepositoryContentContent</Name>
+			<Description>Create/Update Repository Content Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="271">
+			<Name>PutRepositoryContentLinkHeader</Name>
+			<Description>Create/Update Repository Content Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="226">
+			<Name>PutRepositorySecretContent</Name>
+			<Description>Create/Update Repository Secret Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="276">
+			<Name>PutRepositorySecretLinkHeader</Name>
+			<Description>Create/Update Repository Secret Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="228">
+			<Name>GetRepositoryPublicKeyContent</Name>
+			<Description>Get Repository Public Key Content</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		<Param id="278">
+			<Name>GetRepositoryPublicKeyLinkHeader</Name>
+			<Description>Get Repository Public Key Link Header</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+		</Param>
+		
+		<Param id="300">
+			<Name>Title_End_Generic</Name>
+			<Type>fixed</Type>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<!--Note that by adding multiple positions,
+					the same title end can be re-used for closing different group boxes.
+					Indeed, Cube only uses the positions in order to potentially group a title begin to a title end.-->
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>4</Row>
+					</Position>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>1</Column>
+						<Row>3</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="end">title</Type>
+			</Measurement>
+		</Param>
+		<Param id="301">
+			<Name>Title_Begin_SingleRepository</Name>
+			<Description>Single Repository</Description>
+			<Type>fixed</Type>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="begin">title</Type>
+			</Measurement>
+		</Param>
+		<Param id="302">
+			<Name>Title_Begin_OrganizationRepositories</Name>
+			<Description>Organization Repositories</Description>
+			<Type>fixed</Type>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>1</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="begin">title</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="500">
+			<Name>AddRepositoryButton</Name>
+			<Type>write</Type>
+			<Information>
+				<Subtext>The button that trigger an add to the repositories table.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>3</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type width="110">button</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Add Repository</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="501" trending="false">
+			<Name>AddRepositoryName</Name>
+			<Description>Add Repository Name</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The name of the repository to add.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<DefaultValue>-2</DefaultValue>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display>Please Fill in...</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="601" setter="true">
+			<Name>AddRepositoryName</Name>
+			<Description>Add Repository Name</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="502" trending="false">
+			<Name>AddRepositoryOwner</Name>
+			<Description>Add Repository Owner</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The owner of the repository to add.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<DefaultValue>-2</DefaultValue>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display>Please Fill in...</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="602" setter="true">
+			<Name>AddRepositoryOwner</Name>
+			<Description>Add Repository Owner</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>0</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="505">
+			<Name>AddOrganizationRepositoriesButton</Name>
+			<Type>write</Type>
+			<Information>
+				<Subtext>The button that trigger an add to the repositories table.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>1</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type width="110">button</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Add Repositories</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="506" trending="false">
+			<Name>AddOrganizationRepositories</Name>
+			<Description>Add Organization Repositories</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The organization that holds the repositories.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>1</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets dependencyId="507" />
+			</Measurement>
+		</Param>
+		<Param id="606" setter="true">
+			<Name>AddOrganizationRepositories</Name>
+			<Description>Add Organization Repositories</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Repository</Page>
+						<Column>1</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets dependencyId="507" />
+			</Measurement>
+		</Param>
+		<Param id="507" trending="false">
+			<Name>AddOrganizationRepositories_DiscreetList</Name>
+			<Description>Add Organization Repositories Discreet List</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay onAppLevel="true">true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="550">
+			<Name>AddWorkflowButton</Name>
+			<Type>write</Type>
+			<Information>
+				<Subtext>The button that triggers the creation of the specified workflow to the selected repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>3</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type width="110">button</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Add Workflow</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="551" trending="false">
+			<Name>AddWorkflowRepository</Name>
+			<Description>Repository</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The repository the workflow needs to be added to.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets dependencyId="552" />
+			</Measurement>
+		</Param>
+		<Param id="651" setter="true">
+			<Name>AddWorkflowRepository</Name>
+			<Description>Repository</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets dependencyId="552" />
+			</Measurement>
+		</Param>
+		<Param id="552" trending="false">
+			<Name>AddWorkflowRepository_DiscreetList</Name>
+			<Description>Add Workflow Repository Discreet List</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay onAppLevel="true">true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="553" trending="false">
+			<Name>AddWorkflowBranch</Name>
+			<Description>Branch</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The branch the workflow needs to be added to.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<DefaultValue>Default Branch</DefaultValue>
+				<Exceptions>
+					<Exception id="1" value="">
+						<Display state="enabled">Default Branch</Display>
+						<Value></Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets dependencyId="554" />
+			</Measurement>
+		</Param>
+		<Param id="653" setter="true">
+			<Name>AddWorkflowBranch</Name>
+			<Description>Branch</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets dependencyId="554" />
+			</Measurement>
+		</Param>
+		<Param id="554" trending="false">
+			<Name>AddWorkflowBranch_DiscreetList</Name>
+			<Description>Add Workflow Branch Discreet List</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<DefaultValue>Default Branch</DefaultValue>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="555" trending="false">
+			<Name>AddWorkflowWorkflow</Name>
+			<Description>Workflow</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The workflow you want to add to the selected repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Automation Script CI</Display>
+						<Value>0</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Automation Script CD</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="655" setter="true">
+			<Name>AddWorkflowWorkflow</Name>
+			<Description>Workflow</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Add Workflow</Page>
+						<Column>0</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Automation Script CI</Display>
+						<Value>0</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Automation Script CD</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		
+		<Param id="990">
+			<Name>Repositories_ContextMenu</Name>
+			<Description>Context Menu for Repositories Table</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet dependencyValues="1002;1005">
+						<Display>Add...</Display>
+						<Value>1</Value>
+					</Discreet>
+					<Discreet options="table:selection;confirm:The selected item(s) will be deleted permanently and the repositories will no be tracked anymore.">
+						<Display>Delete selected row(s)</Display>
+						<Value>2</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="992">
+			<Name>Repositories_ChangeRequest</Name>
+			<Description>Repositories Change Request</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay onAppLevel="true">true</RTDisplay>
+			</Display>
+		</Param>
+		<Param id="996">
+			<Name>RepositoriesOverview</Name>
+			<Description>Repositories Overview</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Repositories - Overview</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+		</Param>
+		
+		<Param id="1000">
+			<Name>Repositories</Name>
+			<Description>Repositories</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="1001" type="retrieved" options="" />
+				<ColumnOption idx="1" pid="1002" type="retrieved" options=";save" />
+				<ColumnOption idx="2" pid="1003" type="retrieved" options="" />
+				<ColumnOption idx="3" pid="1004" type="retrieved" options="" />
+				<ColumnOption idx="4" pid="1005" type="retrieved" options=";save" />
+				<ColumnOption idx="5" pid="1006" type="retrieved" options="" />
+				<ColumnOption idx="6" pid="1007" type="retrieved" options="" />
+				<ColumnOption idx="7" pid="1008" type="retrieved" options="" />
+				<ColumnOption idx="8" pid="1009" type="retrieved" options="" />
+				<ColumnOption idx="9" pid="1010" type="retrieved" options=";enableHeaderSum;enableHistogram;enableHeatmap" />
+				<ColumnOption idx="10" pid="1011" type="retrieved" options=";enableHeaderSum;enableHistogram;enableHeatmap" />
+				<ColumnOption idx="11" pid="1012" type="retrieved" options=";enableHeaderSum;enableHistogram;enableHeatmap" />
+				<ColumnOption idx="12" pid="1013" type="retrieved" options="" />
+				<ColumnOption idx="13" pid="1014" type="retrieved" options="" />
+				<ColumnOption idx="14" pid="1015" type="retrieved" options="" />
+				<ColumnOption idx="15" pid="1016" type="retrieved" options="" />
+				<ColumnOption idx="16" pid="1017" type="retrieved" options="" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>A list of all the tracked repositories.</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Repositories</Page>
+						<Column>0</Column>
+						<Row>1</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="tab=columns:1001|0-1002|1-1003|2-1004|3-1005|4-1006|5-1007|6-1008|7-1009|8-1010|9-1011|10-1012|11-1013|12-1014|13-1015|14-1016|15-1017|16,width:100-134-157-140-165-137-144-160-165-157-123-128-147-103-100-0-0,sort:STRING|ASC|1-STRING-STRING-STRING-STRING-STRING-STRING-INT-INT|DESC|0-INT-INT-INT-INT-STRING-STRING-STRING-STRING,lines:25,filter:true">table</Type>
+			</Measurement>
+		</Param>
+		<Param id="1001" trending="false">
+			<Name>RepositoriesFullName</Name>
+			<Description>Full Name (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The full name of the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1002" trending="false">
+			<Name>RepositoriesName</Name>
+			<Description>Name (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The name of the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1003" trending="false">
+			<Name>RepositoriesPrivate</Name>
+			<Description>Private (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Indicates if the repository is public or private.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Private</Display>
+						<Value>1</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Public</Display>
+						<Value>0</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1004" trending="false">
+			<Name>RepositoriesDescription</Name>
+			<Description>Description (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The description of the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1005" trending="false">
+			<Name>RepositoriesOwner</Name>
+			<Description>Owner (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The owner of the repository</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1006" trending="false">
+			<Name>RepositoriesFork</Name>
+			<Description>Fork (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Indicates if the repository is a fork.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Fork</Display>
+						<Value>1</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Normal</Display>
+						<Value>0</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1007" trending="false">
+			<Name>RepositoriesCreatedAt</Name>
+			<Description>Created At (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The time in UTC when the repository was created.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1008" trending="false">
+			<Name>RepositoriesUpdatedAt</Name>
+			<Description>Updated At (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The time in UTC when the repository was last updated.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1009" trending="false">
+			<Name>RepositoriesPushedAt</Name>
+			<Description>Pushed At (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The time of the last push to the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1010" trending="true">
+			<Name>RepositoriesSize</Name>
+			<Description>Size (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The total size of the repository in kilo bytes</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>0</Normal>
+				<WaH>100000</WaH>
+				<MiH>150000</MiH>
+				<MaH>250000</MaH>
+				<CH>1000000</CH>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Units>kB</Units>
+				<Range>
+					<Low>0</Low>
+				</Range>
+			</Display>
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1011" trending="true">
+			<Name>RepositoriesStars</Name>
+			<Description>Stars (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The amount of stars the repository has.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<!-- SuppressValidator 2.9.7 No units needed -->
+			<!-- SuppressValidator 2.5.1 Depends on use case. -->
+			<Alarm>
+				<Monitored>true</Monitored>
+			</Alarm>
+			<!-- /SuppressValidator 2.5.1 -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Range>
+					<Low>0</Low>
+				</Range>
+			</Display>
+			<!-- /SuppressValidator 2.9.7 -->
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1012" trending="true">
+			<Name>RepositoriesWatcher</Name>
+			<Description>Watcher (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The total amount of watchers the repository has.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<!-- SuppressValidator 2.9.7 No units  -->
+			<!-- SuppressValidator 2.5.1 Depends on use case. -->
+			<Alarm>
+				<Monitored>true</Monitored>
+			</Alarm>
+			<!-- /SuppressValidator 2.5.1 -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Range>
+					<Low>0</Low>
+				</Range>
+			</Display>
+			<!-- /SuppressValidator 2.9.7 -->
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1013" trending="false">
+			<Name>RepositoriesLanguage</Name>
+			<Description>Language (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The main language of the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<!-- SuppressValidator 2.5.1 Depends on use case. -->
+			<Alarm>
+				<Monitored>true</Monitored>
+			</Alarm>
+			<!-- /SuppressValidator 2.5.1 -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1014" trending="false">
+			<Name>RepositoriesDefaultBranch</Name>
+			<Description>Default Branch (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The default branch of the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>main</Normal>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1015" trending="false">
+			<Name>RepositoriesType</Name>
+			<Description>Type (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The type of the repository</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="1" value="0">
+						<Display state="enabled">Other</Display>
+						<Value>0</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Automation</Display>
+						<Value>1</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Connector</Display>
+						<Value>2</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1016" trending="false">
+			<Name>RepositoriesPublicKeyId</Name>
+			<Description>Public Key ID (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The ID of the public key.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1017" trending="false">
+			<Name>RepositoriesPublicKey</Name>
+			<Description>Public Key (Repositories)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The public key for the repository.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="password">string</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="1200">
+			<Name>RepositoryTags</Name>
+			<Description>Repository Tags</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="1201" type="retrieved" options=""/>
+				<ColumnOption idx="1" pid="1202" type="retrieved" options="" />
+				<ColumnOption idx="2" pid="1203" type="retrieved" options=";foreignKey=1000" />
+				<ColumnOption idx="3" pid="1204" type="retrieved" options="" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>A list of all the tags the tracked repositories have.</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Repositories</Page>
+						<Column>0</Column>
+						<Row>2</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="tab=columns:1201|0-1202|1-1203|2-1204|3,width:100-100-111-100,sort:STRING-STRING-STRING-STRING,lines:25,filter:true">table</Type>
+			</Measurement>
+		</Param>
+		<Param id="1201" trending="false">
+			<Name>RepositoryTagsId</Name>
+			<Description>ID (Repository Tags)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>This is the key used internally by DataMiner to identify the table entries.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1202" trending="false">
+			<Name>RepositoryTagsName</Name>
+			<Description>Name (Repository Tags)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The name of the tag.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1203" trending="false">
+			<Name>RepositoryTagsRepositoryID</Name>
+			<Description>Repository ID (Repository Tags)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The ID of the repository this tag is linked.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1204" trending="false">
+			<Name>RepositoryTagsCommitSha</Name>
+			<Description>Commit SHA (Repository Tags)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The commit ID where the tag was placed on.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="1400">
+			<Name>RepositoryReleases</Name>
+			<Description>Repository Releases</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="1401" type="retrieved" options=""/>
+				<ColumnOption idx="1" pid="1402" type="retrieved" options="" />
+				<ColumnOption idx="2" pid="1403" type="retrieved" options="" />
+				<ColumnOption idx="3" pid="1404" type="retrieved" options=";foreignKey=1200" />
+				<ColumnOption idx="4" pid="1405" type="retrieved" options="" />
+				<ColumnOption idx="5" pid="1406" type="retrieved" options="" />
+				<ColumnOption idx="6" pid="1407" type="retrieved" options="" />
+				<ColumnOption idx="7" pid="1408" type="retrieved" options="" />
+				<ColumnOption idx="8" pid="1409" type="retrieved" options="" />
+				<ColumnOption idx="9" pid="1410" type="retrieved" options="" />
+				<ColumnOption idx="10" pid="1411" type="retrieved" options="" />
+				<ColumnOption idx="11" pid="1412" type="retrieved" options="" />
+				<ColumnOption idx="12" pid="1413" type="retrieved" options=";foreignKey=1000" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>A list of all the repository releases.</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Repositories</Page>
+						<Column>0</Column>
+						<Row>3</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="tab=columns:1401|0-1402|1-1403|2-1404|3-1405|4-1406|5-1407|6-1408|7-1409|8-1410|9-1411|10-1412|11-1413|12,width:100-100-100-0-118-100-100-100-100-100-144-144-111,sort:STRING|ASC|1-INT-STRING-STRING-STRING-STRING-STRING-STRING-STRING-STRING-INT-INT|DESC|0-STRING,lines:25,filter:true">table</Type>
+			</Measurement>
+		</Param>
+		<Param id="1401" trending="false">
+			<Name>RepositoryReleasesInstance</Name>
+			<Description>Instance (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>This is the key used internally by DataMiner to identify the table entries.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1402" trending="false">
+			<Name>RepositoryReleasesId</Name>
+			<Description>ID (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The ID of the release.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<!-- SuppressValidator 2.9.7 Id doesn't have a unit -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Range>
+					<Low>0</Low>
+				</Range>
+			</Display>
+			<!-- /SuppressValidator 2.9.7 -->
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1403" trending="false">
+			<Name>RepositoryReleasesTagName</Name>
+			<Description>Tag Name (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The name of the tag this release is linked with.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1404" trending="false">
+			<Name>RepositoryReleasesTagId</Name>
+			<Description>Tag Id (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The dataminer id of the tag this release is linked with.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1405" trending="false">
+			<Name>RepositoryReleasesTargetCommitish</Name>
+			<Description>Target Commitish (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The branch this relaese is targetting.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1406" trending="false">
+			<Name>RepositoryReleasesName</Name>
+			<Description>Name (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The name of the release</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1407" trending="false">
+			<Name>RepositoryReleasesDraft</Name>
+			<Description>Draft (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Indication if this release is a draft or not.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Draft</Display>
+						<Value>1</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Normal</Display>
+						<Value>0</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1408" trending="false">
+			<Name>RepositoryReleasesPreRelease</Name>
+			<Description>Pre-Release (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Indication if this release is a pre-release or not.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Pre-Release</Display>
+						<Value>1</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Release</Display>
+						<Value>0</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1409" trending="false">
+			<Name>RepositoryReleasesBody</Name>
+			<Description>Body (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>A description for the release.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1410" trending="false">
+			<Name>RepositoryReleasesAuthor</Name>
+			<Description>Author (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The author of this release.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1411" trending="false">
+			<Name>RepositoryReleasesCreatedAt</Name>
+			<Description>Created At (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The creation date of the release in UTC time.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1412" trending="false">
+			<Name>RepositoryReleasesPublishedAt</Name>
+			<Description>Published At (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The in UTC when the release was publsihed.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1413" trending="false">
+			<Name>RepositoryReleasesRepositoryId</Name>
+			<Description>Repository ID (Repository Releases)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The id of the repository this release is linked with.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="1590">
+			<Name>RepositoryWorkflows_ContextMenu</Name>
+			<Description>Context Menu for Repository Workflows Table</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet dependencyValues="1602:[value:1602];555">
+						<Display>Add...</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1592">
+			<Name>RepositoryWorkflow_ChangeRequest</Name>
+			<Description>Repository Workflow Change Request</Description>
+			<Type>read</Type>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay onAppLevel="true">true</RTDisplay>
+			</Display>
+		</Param>
+		<Param id="1600">
+			<Name>RepositoryWorkflows</Name>
+			<Description>Repository Workflows</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="1601" type="retrieved" options=""/>
+				<ColumnOption idx="1" pid="1602" type="retrieved" options=";foreignKey=1000" />
+				<ColumnOption idx="2" pid="1603" type="retrieved" options="" />
+				<ColumnOption idx="3" pid="1604" type="retrieved" options="" />
+				<ColumnOption idx="4" pid="1605" type="retrieved" options="" />
+				<ColumnOption idx="5" pid="1606" type="retrieved" options="" />
+				<ColumnOption idx="6" pid="1607" type="retrieved" options=";enableHeaderSum;enableHistogram;enableHeatmap" />
+				<ColumnOption idx="7" pid="1608" type="retrieved" options=";enableHeaderSum;enableHistogram;enableHeatmap" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>A list of all the workflows per tracked repository.</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Workflows</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<!-- SuppressValidator 2.31.9 More important to be grouped by repository then by datetime column -->
+				<Type options="tab=columns:1601|0-1602|1-1603|2-1604|3-1605|4-1606|5-1607|6-1608|7,width:100-0-100-108-100-144-144-144,sort:STRING|ASC|0-STRING-STRING-STRING-STRING-INT|ASC|1-INT-INT,lines:25,filter:true">table</Type>
+				<!-- /SuppressValidator 2.31.9 -->
+			</Measurement>
+		</Param>
+		<Param id="1601" trending="false">
+			<Name>RepositoryWorkflowsId</Name>
+			<Description>ID (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>This is the key used internally by DataMiner to identify the table entries.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1602" trending="false">
+			<Name>RepositoryWorkflowsRepositoryId</Name>
+			<Description>Repository ID (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The ID of the repository this workflow is linked.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1603" trending="false">
+			<Name>RepositoryWorkflowsName</Name>
+			<Description>Name (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The name of the workflow.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<!-- SuppressValidator 2.5.1 Depends on use case -->
+			<Alarm>
+				<Monitored>true</Monitored>
+			</Alarm>
+			<!-- /SuppressValidator 2.5.1 -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1604" trending="false">
+			<Name>RepositoryWorkflowsState</Name>
+			<Description>State (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The state of the workflow</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>active</Normal>
+				<MaH>disabled_fork;disabled_inactivity;disabled_manually</MaH>
+				<CH>deleted</CH>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Active</Display>
+						<Value>active</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Deleted</Display>
+						<Value>deleted</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Disabled Fork</Display>
+						<Value>disabled_fork</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Disabled Inactivity</Display>
+						<Value>disabled_inactivity</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Disabled Manually</Display>
+						<Value>disabled_manually</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="1605" trending="false">
+			<Name>RepositoryWorkflowsPath</Name>
+			<Description>Path (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The path to the workflow yaml file.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<!-- SuppressValidator 2.5.1 Depends on use case -->
+			<Alarm>
+				<Monitored>true</Monitored>
+			</Alarm>
+			<!-- /SuppressValidator 2.5.1 -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="1606" trending="false">
+			<Name>RepositoryWorkflowsCreatedAt</Name>
+			<Description>Created At (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The datetime when the workflow was created.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1607" trending="false">
+			<Name>RepositoryWorkflowsUpdatedAt</Name>
+			<Description>Updated At (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The datetime of the last update to the workflow</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<!-- SuppressValidator 2.5.1 Depends on use case -->
+			<Alarm>
+				<Monitored>true</Monitored>
+			</Alarm>
+			<!-- /SuppressValidator 2.5.1 -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="1608" trending="false">
+			<Name>RepositoryWorkflowsDeletedAt</Name>
+			<Description>Deleted At (Repository Workflows)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The datetime when the workflow was deleted.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>-2</Normal>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="2000">
+			<Name>RepositoryIssues</Name>
+			<Description>Repository Issues</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="2001" type="retrieved" options=""/>
+				<ColumnOption idx="1" pid="2002" type="retrieved" options="" />
+				<ColumnOption idx="2" pid="2003" type="retrieved" options="" />
+				<ColumnOption idx="3" pid="2004" type="retrieved" options="" />
+				<ColumnOption idx="4" pid="2005" type="retrieved" options="" />
+				<ColumnOption idx="5" pid="2006" type="retrieved" options="" />
+				<ColumnOption idx="6" pid="2007" type="retrieved" options="" />
+				<ColumnOption idx="7" pid="2008" type="retrieved" options="" />
+				<ColumnOption idx="8" pid="2009" type="retrieved" options="" />
+				<ColumnOption idx="9" pid="2010" type="retrieved" options="" />
+				<ColumnOption idx="10" pid="2011" type="retrieved" options=";foreignKey=1000" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>A list containing all the issues linked to the repository.</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Issues</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="tab=columns:2001|0-2002|1-2003|2-2004|3-2005|4-2006|5-2007|6-2008|7-2009|8-2010|9-2011|10,width:100-100-100-100-100-100-144-144-144-144-111,sort:STRING|DESC|1-INT-STRING-STRING-STRING-STRING-STRING-INT|DESC|0-INT-INT-STRING,lines:25,filter:true">table</Type>
+			</Measurement>
+		</Param>
+		<Param id="2001" trending="false">
+			<Name>RepositoryIssuesInstance</Name>
+			<Description>Instance (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>This is the key used internally by DataMiner to identify the table entries.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="2002" trending="false">
+			<Name>RepositoryIssuesNumber</Name>
+			<Description>Number (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The issue number.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<!-- SuppressValidator 2.9.7 Doesn't have a unit -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Range>
+					<Low>1</Low>
+				</Range>
+			</Display>
+			<!-- /SuppressValidator 2.9.7 -->
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="2003" trending="false">
+			<Name>RepositoryIssuesTitle</Name>
+			<Description>Title (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The title of the issue.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="2004" trending="false">
+			<Name>RepositoryIssuesBody</Name>
+			<Description>Body (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The body of the issue.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="2005" trending="false">
+			<Name>RepositoryIssuesCreator</Name>
+			<Description>Creator (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The creator of the issue</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="2006" trending="false">
+			<Name>RepositoryIssuesState</Name>
+			<Description>State (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The state of the issue.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<Normal>closed</Normal>
+				<CH>open</CH>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Open</Display>
+						<Value>open</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Closed</Display>
+						<Value>closed</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="2007" trending="false">
+			<Name>RepositoryIssuesAssignee</Name>
+			<Description>Assignee (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The person assigned to fix the issue.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="2008" trending="false">
+			<Name>RepositoryIssuesCreatedAt</Name>
+			<Description>Created At (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The datetime in UTC when the task was created.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="2009" trending="false">
+			<Name>RepositoryIssuesUpdatedAt</Name>
+			<Description>Updated At (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The datetime when the issue was last updated.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="2010" trending="false">
+			<Name>RepositoryIssuesClosedAt</Name>
+			<Description>Closed At (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The datetime when the issue was closed.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="2" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="2011" trending="false">
+			<Name>RepositoryIssuesRepositoryId</Name>
+			<Description>Repository ID (Repository Issues)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The ID of the repository this issue is linked.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		
+		<Param id="3000">
+			<Name>Organizations</Name>
+			<Description>Organizations</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="3001" type="retrieved" options=""/>
+				<ColumnOption idx="1" pid="3002" type="retrieved" options="" />
+				<ColumnOption idx="2" pid="3003" type="retrieved" options="" />
+				<ColumnOption idx="3" pid="3004" type="retrieved" options="" />
+				<ColumnOption idx="4" pid="3005" type="retrieved" options=";save" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>Table containing a list of all the organizations.</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Organizations</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<Type options="tab=columns:3001|0-3002|1-3003|2-3004|3-3005|4,width:250-0-100-400-121,sort:STRING-INT-STRING-STRING-STRING,lines:25,filter:true">table</Type>
+			</Measurement>
+		</Param>
+		<Param id="3001" trending="false">
+			<Name>OrganizationsInstance</Name>
+			<Description>Instance (Organizations)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>This is the key used internally by DataMiner to identify the table entries.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="3002" trending="false">
+			<Name>OrganizationsId</Name>
+			<Description>Id (Organizations)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The ID used by GitHub to identify the organization.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<!-- SuppressValidator 2.9.7 An ID does not have a unit. -->
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Range>
+					<Low>0</Low>
+				</Range>
+			</Display>
+			<!-- /SuppressValidator 2.9.7 -->
+			<Measurement>
+				<Type>number</Type>
+			</Measurement>
+		</Param>
+		<Param id="3003" trending="false">
+			<Name>OrganizationsDescription</Name>
+			<Description>Description (Organizations)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The description for the organization</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+				<Exceptions>
+					<Exception id="1" value="-2">
+						<Display state="disabled">N/A</Display>
+						<Value>-2</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="3004" trending="false">
+			<Name>OrganizationsAvatarUrl</Name>
+			<Description>Avatar URL (Organizations)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>The url the the avatar of the organization.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="3005" trending="false">
+			<Name>OrganizationsTrackRepositories</Name>
+			<Description>Track Repositories (Organizations)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Indicates if the repositories under this origanization should be polled.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Disabled</Display>
+						<Value>0</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Enabled</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="3105" setter="true">
+			<Name>OrganizationsTrackRepositories</Name>
+			<Description>Track Repositories (Organizations)</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Message>
+				<![CDATA[This will enable/disable tracking of all the repositories under this organization. 
+When enabling it will also start polling all the repositories. 
+When disabling it will remove all the repositories under this organization.
+				
+Are you sure you want to continue.]]>
+			</Message>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>togglebutton</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Disabled</Display>
+						<Value>0</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Enabled</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		
+		<Param id="21000">
+			<Name>PollManager</Name>
+			<Description>Poll Manager</Description>
+			<Type>array</Type>
+			<ArrayOptions index="0">
+				<ColumnOption idx="0" pid="21001" type="retrieved" options="" />
+				<ColumnOption idx="1" pid="21002" type="retrieved" options=";save" />
+				<ColumnOption idx="2" pid="21003" type="retrieved" options=";save" />
+				<ColumnOption idx="3" pid="21004" type="retrieved" options=";save" />
+				<ColumnOption idx="4" pid="21005" type="retrieved" options="" />
+				<ColumnOption idx="5" pid="21006" type="retrieved" options="" />
+				<ColumnOption idx="6" pid="21007" type="retrieved" options="" />
+			</ArrayOptions>
+			<Information>
+				<Subtext>Poll Manager</Subtext>
+			</Information>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Positions>
+					<Position>
+						<Page>Poll Manager</Page>
+						<Column>0</Column>
+						<Row>0</Row>
+					</Position>
+				</Positions>
+			</Display>
+			<Measurement>
+				<!-- SuppressValidator 2.31.9 Poll Manager Table -->
+				<Type options="tab=columns:21001|0-21002|1-21003|2-21004|3-21005|4-21006|5-21007|6,width:0-200-80-138-144-100-0,sort:STRING|ASC-STRING-STRING-INT-INT-STRING-INT,lines:25,filter:true">table</Type>
+				<!-- /SuppressValidator 2.31.9 -->
+			</Measurement>
+		</Param>
+		<Param id="21001" trending="false">
+			<Name>PollManagerIndex</Name>
+			<Description>Index [IDX] (Poll Manager)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Internal DataMiner Table key.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="21002" trending="false">
+			<Name>PollManagerName</Name>
+			<Description>Name (Poll Manager)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Name of the API request to that polls certain requests.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>other</RawType>
+				<Type>string</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>string</Type>
+			</Measurement>
+		</Param>
+		<Param id="21003" trending="true">
+			<Name>PollManagerPollState</Name>
+			<Description>Poll State (Poll Manager)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Poll Manager Poll State</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Alarm>
+				<Monitored>true</Monitored>
+				<CH>0</CH>
+				<Normal>1</Normal>
+			</Alarm>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>discreet</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Disabled</Display>
+						<Value>0</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Enabled</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="21053" setter="true">
+			<Name>PollManagerPollState</Name>
+			<Description>Poll State (Poll Manager)</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type>togglebutton</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Disabled</Display>
+						<Value>0</Value>
+					</Discreet>
+					<Discreet>
+						<Display>Enabled</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="21004" trending="false">
+			<Name>PollManagerPollFrequency</Name>
+			<Description>Poll Frequency (Poll Manager)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Poll Manager Poll Frequency</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Range>
+					<Low>10</Low>
+				</Range>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+				<Range>
+					<Low>10</Low>
+				</Range>
+			</Display>
+			<Measurement>
+				<Type options="time">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="21054" setter="true">
+			<Name>PollManagerPollFrequency</Name>
+			<Description>Poll Frequency (Poll Manager)</Description>
+			<Type>write</Type>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Decimals>8</Decimals>
+				<Range>
+					<Low>10</Low>
+				</Range>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Range>
+					<Low>10</Low>
+				</Range>
+			</Display>
+			<Measurement>
+				<Type options="time">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="21005" trending="false">
+			<Name>PollManagerLastPolled</Name>
+			<Description>Last Polled UTC Time (Poll Manager)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Poll Manager Last Polled</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Decimals>8</Decimals>
+				<Exceptions>
+					<Exception id="1" value="0">
+						<Display state="disabled">Not Polled</Display>
+						<Value>0</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+		<Param id="21006" trending="false">
+			<Name>PollManagerRefresh</Name>
+			<Description>Manual Refresh (Poll Manager)</Description>
+			<Type>write</Type>
+			<Information>
+				<Subtext>Poll Manager Manual Refresh action.</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+			</Display>
+			<Measurement>
+				<Type width="110">button</Type>
+				<Discreets>
+					<Discreet>
+						<Display>Refresh</Display>
+						<Value>1</Value>
+					</Discreet>
+				</Discreets>
+			</Measurement>
+		</Param>
+		<Param id="21007" trending="false">
+			<Name>PollManagerPreviouslyPolled</Name>
+			<Description>Previously Polled UTC Time (Poll Manager)</Description>
+			<Type>read</Type>
+			<Information>
+				<Subtext>Poll Manager Polled before last attempt (PID21005)</Subtext>
+			</Information>
+			<Interprete>
+				<RawType>numeric text</RawType>
+				<Type>double</Type>
+				<LengthType>next param</LengthType>
+				<Decimals>8</Decimals>
+				<Exceptions>
+					<Exception id="1" value="0">
+						<Display state="disabled">Not Polled</Display>
+						<Value>0</Value>
+					</Exception>
+				</Exceptions>
+			</Interprete>
+			<Display>
+				<RTDisplay>true</RTDisplay>
+				<Decimals>8</Decimals>
+			</Display>
+			<Measurement>
+				<Type options="datetime">number</Type>
+			</Measurement>
+		</Param>
+	</Params>
+
+	<QActions>
+		<QAction id="1" name="Precompiled Code" encoding="csharp" options="precompile" />
+		<QAction id="2" name="After Startup" encoding="csharp" triggers="2" />
+		<QAction id="19" name="Parse general parameters" encoding="csharp" triggers="11;19"></QAction>
+
+		<QAction id="990" name="Repositories Table - ContextMenu" encoding="csharp" triggers="990" />
+		<QAction id="992" name="Repositories Table - Changes" encoding="csharp" triggers="992" />
+		<QAction id="1000" name="Add Repositories page" encoding="csharp" triggers="500;505"></QAction>
+
+		<QAction id="1590" name="Repository Workflow Table - ContextMenu" encoding="csharp" triggers="1590" />
+		<QAction id="1592" name="Repositories Workflow Table - Changes" encoding="csharp" triggers="1592" />
+		<QAction id="1600" name="Add Repository Workflow page" encoding="csharp" triggers="550;651"></QAction>
+
+		<QAction id="3000" name="Organizations Table - Changes" encoding="csharp" triggers="3105" row="true" />
+		
+		<QAction id="20000" name="HTTP Request Handling" encoding="csharp" triggers="30" />
+		<QAction id="20001" name="HTTP Parse Responses" encoding="csharp" triggers="201;202;203;204;205;210;211;220;221;226;228"></QAction>
+		<QAction id="20002" name="HTTP Poll Manager Updates" encoding="csharp" row="true" triggers="21006" />
+	</QActions>
+
+	<HTTP>
+		<Session id="1" name="Get Repository">
+			<Connection id="1" name="Get Repository">
+				<Request verb="GET" pid="101">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="201"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="251"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="2" name="Get Repository Issues">
+			<Connection id="2" name="Get Repository Issues">
+				<Request verb="GET" pid="102">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="202"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="252"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="3" name="Get Repository Tags">
+			<Connection id="3" name="Get Repository Tags">
+				<Request verb="GET" pid="103">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="203"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="253"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="4" name="Get Repository Releases">
+			<Connection id="4" name="Get Repository Releases">
+				<Request verb="GET" pid="104">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="204"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="254"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="5" name="Get Repository Workflows">
+			<Connection id="5" name="Get Repository Workflows">
+				<Request verb="GET" pid="105">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="205"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="255"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+
+		<Session id="10" name="Get User Organizations">
+			<Connection id="10" name="Get User Organizations">
+				<Request verb="GET" pid="110">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="210"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="260"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="11" name="Get Organization Repositories">
+			<Connection id="11" name="Get Organization Repositories">
+				<Request verb="GET" pid="111">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="211"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="261"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+
+		<Session id="20" name="Get Repository Content">
+			<Connection id="20" name="Get Repository Content">
+				<Request verb="GET" pid="120">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="220"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="270"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="21" name="Create/Update Repository Content">
+			<Connection id="21" name="Create/Update Repository Content">
+				<Request verb="PUT" pid="121">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Content-Type">application/json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+					<Data pid="171"/>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="221"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="271"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+
+		<!--ID 25 for Get Repository Secret-->
+		<!--ID 26 for Put Repository Secret-->
+		<!--ID 27 for Delete Repository Secret-->
+		<!--ID 28 for Get Repository Pulic Key-->
+		<Session id="26" name="Create/Update Repository Secret">
+			<Connection id="26" name="Create/Update Repository Secret">
+				<Request verb="PUT" pid="126">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Content-Type">application/json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+					<Data pid="176"/>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="226"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="276"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+		<Session id="28" name="Get Repository Pulic Key">
+			<Connection id="28" name="Get Repository Public Key">
+				<Request verb="GET" pid="128">
+					<Headers>
+						<Header key="Accept">application/vnd.github+json</Header>
+						<Header key="Authorization" pid="12"></Header>
+						<!-- SuppressValidator 8.3.1 Required github header -->
+						<Header key="X-GitHub-Api-Version" pid="13"></Header>
+						<!-- /SuppressValidator 8.3.1 -->
+					</Headers>
+				</Request>
+				<Response statusCode="100">
+					<Content pid="228"></Content>
+					<Headers>
+						<Header key="x-ratelimit-limit" pid="15"></Header>
+						<Header key="x-ratelimit-remaining" pid="16"></Header>
+						<Header key="x-ratelimit-used" pid="17"></Header>
+						<Header key="x-ratelimit-reset" pid="19"></Header>
+						<Header key="Link" pid="278"/>
+					</Headers>
+				</Response>
+			</Connection>
+		</Session>
+	</HTTP>
+
+	<Groups>
+		<Group id="2">
+			<Name>After Startup</Name>
+			<Description>After Startup</Description>
+			<Type>poll action</Type>
+			<Content>
+				<Action>2</Action>
+			</Content>
+		</Group>
+
+		<Group id="15">
+			<Name>PollManager</Name>
+			<Type>poll action</Type>
+			<Content>
+				<Action>15</Action>
+			</Content>
+		</Group>
+
+		<Group id="201">
+			<Name>PollRepository</Name>
+			<Description>Poll Repository</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>1</Session>
+			</Content>
+		</Group>
+		<Group id="202">
+			<Name>PollRepositoryIssues</Name>
+			<Description>Poll Repository Issues</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>2</Session>
+			</Content>
+		</Group>
+		<Group id="203">
+			<Name>PollRepositoryTags</Name>
+			<Description>Poll Repository Tags</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>3</Session>
+			</Content>
+		</Group>
+		<Group id="204">
+			<Name>PollRepositoryReleases</Name>
+			<Description>Poll Repository Releases</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>4</Session>
+			</Content>
+		</Group>
+		<Group id="205">
+			<Name>PollRepositoryWorkflows</Name>
+			<Description>Poll Repository Workflows</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>5</Session>
+			</Content>
+		</Group>
+
+		<Group id="210">
+			<Name>PollUserOrganizations</Name>
+			<Description>Poll User Organizations</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>10</Session>
+			</Content>
+		</Group>
+		<Group id="211">
+			<Name>PollOrganizationRepositories</Name>
+			<Description>Poll Organization Repositories</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>11</Session>
+			</Content>
+		</Group>
+
+		<Group id="220">
+			<Name>PollRepositoryContent</Name>
+			<Description>Poll Repository Content</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>20</Session>
+			</Content>
+		</Group>
+		<Group id="221">
+			<Name>UpdateRepositoryContent</Name>
+			<Description>Update Repository Content</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>21</Session>
+			</Content>
+		</Group>
+		<Group id="226">
+			<Name>UpdateRepositorySecret</Name>
+			<Description>Update Repository Secret</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>26</Session>
+			</Content>
+		</Group>
+		<Group id="228">
+			<Name>GetRepositoryPublicKey</Name>
+			<Description>Get Repository Public Key</Description>
+			<Type>poll</Type>
+			<Content>
+				<Session>28</Session>
+			</Content>
+		</Group>
+	</Groups>
+
+	<Triggers>
+		<Trigger id="1">
+			<Name>After Startup</Name>
+			<On>protocol</On>
+			<Time>after startup</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>1</Id>
+			</Content>
+		</Trigger>
+
+		<Trigger id="201">
+			<Name>Start GetRepository</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>201</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="202">
+			<Name>Start GetRepository Issues</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>202</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="203">
+			<Name>Start GetRepository Tags</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>203</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="204">
+			<Name>Start GetRepository Releases</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>204</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="205">
+			<Name>Start GetRepository Workflows</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>205</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="210">
+			<Name>Start GetUser Organizations</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>210</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="211">
+			<Name>Start GetOrganization Repositories</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>211</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="220">
+			<Name>Start GetRepository Content</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>220</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="221">
+			<Name>Start PutRepository Content</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>221</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="226">
+			<Name>Start PutRepository Secret</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>226</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="228">
+			<Name>Start GetRepository Public Key</Name>
+			<Type>action</Type>
+			<Content>
+				<Id>228</Id>
+			</Content>
+		</Trigger>
+
+		<Trigger id="251">
+			<Name>After GetRepository</Name>
+			<On id="201">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>251</Id>
+				<Id>301</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="252">
+			<Name>After GetRepository Issues</Name>
+			<On id="202">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>252</Id>
+				<Id>302</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="253">
+			<Name>After GetRepository Tags</Name>
+			<On id="203">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>253</Id>
+				<Id>303</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="254">
+			<Name>After GetRepository Releases</Name>
+			<On id="204">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>254</Id>
+				<Id>304</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="255">
+			<Name>After GetRepository Workflows</Name>
+			<On id="205">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>255</Id>
+				<Id>305</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="260">
+			<Name>After GetUser Organizations</Name>
+			<On id="210">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>260</Id>
+				<Id>310</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="261">
+			<Name>After GetOrganizations Repositories</Name>
+			<On id="211">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>261</Id>
+				<Id>311</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="270">
+			<Name>After GetRepository Content</Name>
+			<On id="220">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>270</Id>
+				<Id>320</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="271">
+			<Name>After PutRepository Content</Name>
+			<On id="221">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>271</Id>
+				<Id>321</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="276">
+			<Name>After PutRepository Secret</Name>
+			<On id="226">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>276</Id>
+				<Id>326</Id>
+			</Content>
+		</Trigger>
+		<Trigger id="278">
+			<Name>After GetRepository Public Key</Name>
+			<On id="228">group</On>
+			<Time>after</Time>
+			<Type>action</Type>
+			<Content>
+				<Id>276</Id>
+				<Id>328</Id>
+			</Content>
+		</Trigger>
+	</Triggers>
+
+	<Actions>
+		<Action id="1">
+			<Name>After Startup Group</Name>
+			<On id="2">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="2">
+			<Name>After Startup QAction</Name>
+			<On id="2">parameter</On>
+			<Type>run actions</Type>
+		</Action>
+
+		<Action id="15">
+			<Name>PollManager</Name>
+			<On id="30">parameter</On>
+			<Type>run actions</Type>
+		</Action>
+
+		<Action id="201">
+			<Name>Get Repository</Name>
+			<On id="201">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="202">
+			<Name>Get Repository Issues</Name>
+			<On id="202">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="203">
+			<Name>Get Repository Tags</Name>
+			<On id="203">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="204">
+			<Name>Get Repository Releases</Name>
+			<On id="204">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="205">
+			<Name>Get Repository Workflows</Name>
+			<On id="205">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="210">
+			<Name>Get User Organizations</Name>
+			<On id="210">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="211">
+			<Name>Get Organization Repositories</Name>
+			<On id="211">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="220">
+			<Name>Get Repository Content</Name>
+			<On id="220">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="221">
+			<Name>Put Repository Content</Name>
+			<On id="221">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="226">
+			<Name>Put Repository Secret</Name>
+			<On id="226">group</On>
+			<Type>execute next</Type>
+		</Action>
+		<Action id="228">
+			<Name>Get Repository Public Key</Name>
+			<On id="228">group</On>
+			<Type>execute next</Type>
+		</Action>
+
+		<Action id="251">
+			<Name>Clear Get Repository Link Header</Name>
+			<On id="251">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="252">
+			<Name>Clear Get Repository Issues Link Header</Name>
+			<On id="252">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="253">
+			<Name>Clear Get Repository Tags Link Header</Name>
+			<On id="253">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="254">
+			<Name>Clear Get Repository Releases Link Header</Name>
+			<On id="254">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="255">
+			<Name>Clear Get Repository Workflows Link Header</Name>
+			<On id="255">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="260">
+			<Name>Clear Get User Organizations Link Header</Name>
+			<On id="260">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="261">
+			<Name>Clear Get Organization Repositories Link Header</Name>
+			<On id="261">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="270">
+			<Name>Clear Get Repository Content Link Header</Name>
+			<On id="270">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="271">
+			<Name>Clear Put Repository Content Link Header</Name>
+			<On id="271">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="276">
+			<Name>Clear Put Repository Secret Link Header</Name>
+			<On id="276">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="278">
+			<Name>Clear Get Repository Public Key Link Header</Name>
+			<On id="278">parameter</On>
+			<Type>clear</Type>
+		</Action>
+
+		<Action id="301">
+			<Name>Clear Repository Content</Name>
+			<On id="201">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="302">
+			<Name>Clear Repository Issues Content</Name>
+			<On id="202">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="303">
+			<Name>Clear Repository Tags Content</Name>
+			<On id="203">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="304">
+			<Name>Clear Repository Releases Content</Name>
+			<On id="204">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="305">
+			<Name>Clear Repository Workflows Content</Name>
+			<On id="205">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="310">
+			<Name>Clear User Organizations Content</Name>
+			<On id="210">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="311">
+			<Name>Clear Organization Repositories</Name>
+			<On id="211">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="320">
+			<Name>Clear Repository Content Content</Name>
+			<On id="220">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="321">
+			<Name>Clear Repository Content Content</Name>
+			<On id="221">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="326">
+			<Name>Clear Repository Secret Content</Name>
+			<On id="226">parameter</On>
+			<Type>clear</Type>
+		</Action>
+		<Action id="328">
+			<Name>Clear Get Repository Public Key Content</Name>
+			<On id="228">parameter</On>
+			<Type>clear</Type>
+		</Action>
+	</Actions>
+
+	<Timers>
+		<Timer id="1">
+			<Name>Fast Timer (10s)</Name>
+			<Time initial="true">10000</Time>
+			<Interval>75</Interval>
+			<Content>
+				<Group>15</Group>
+			</Content>
+		</Timer>
+	</Timers>
+
+	<PortSettings name="HTTP Connection">
+		<IPport>
+			<DefaultValue>443</DefaultValue>
+		</IPport>
+		<BusAddress>
+			<Disabled>true</Disabled>
+		</BusAddress>
+	</PortSettings>
+
+	<VersionHistory>
+		<Branches>
+			<Branch id="1">
+				<Comment>Main Branch</Comment>
+				<SystemVersions>
+					<SystemVersion id="0">
+						<MajorVersions>
+							<MajorVersion id="0">
+								<MinorVersions>
+									<MinorVersion id="1">
+										<Date>2023-09-20</Date>
+										<Provider>
+											<Author>AMA</Author>
+											<Company>Skyline Communications</Company>
+										</Provider>
+										<Changes>
+											<NewFeature>Initial version</NewFeature>
+										</Changes>
+									</MinorVersion>
+									<MinorVersion id="2" basedOn="1.0.0.1">
+										<Date>2023-10-04</Date>
+										<Provider>
+											<Author>AMA</Author>
+											<Company>Skyline Communications</Company>
+										</Provider>
+										<Changes>
+											<Fix>Issue 1 pagination</Fix>
+										</Changes>
+										<References>
+											<Reference type="Github">https://github.com/SkylineCommunications/SLC-Connector-Github-Repositories/issues/1</Reference>
+										</References>
+									</MinorVersion>
+									<MinorVersion id="3" basedOn="1.0.0.2">
+										<Date>2023-10-04</Date>
+										<Provider>
+											<Author>AMA</Author>
+											<Company>Skyline Communications</Company>
+										</Provider>
+										<Changes>
+											<Change>Changed the way the context menu works. Now you can more easily add/remove repos from automation scripts</Change>
+										</Changes>
+									</MinorVersion>
+									<MinorVersion id="4" basedOn="1.0.0.3">
+										<Date>2024-01-30</Date>
+										<Provider>
+											<Author>AMA</Author>
+											<Company>Skyline Communications</Company>
+										</Provider>
+										<Changes>
+											<NewFeature>Added workflows table to the connector.</NewFeature>
+										</Changes>
+									</MinorVersion>
+									<MinorVersion id="5" basedOn="1.0.0.4">
+										<Date>2024-01-30</Date>
+										<Provider>
+											<Author>AMA</Author>
+											<Company>Skyline Communications</Company>
+										</Provider>
+										<Changes>
+											<NewFeature>Added organization table</NewFeature>
+											<NewFeature>Added option to track all the repositories under an organization</NewFeature>
+											<NewFeature>Added a way to create automation scripts workflows</NewFeature>
+										</Changes>
+									</MinorVersion>
+								</MinorVersions>
+							</MajorVersion>
+						</MajorVersions>
+					</SystemVersion>
+				</SystemVersions>
+			</Branch>
+		</Branches>
+	</VersionHistory>
+
+</Protocol>
